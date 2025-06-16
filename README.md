@@ -1,0 +1,1 @@
+A Netflix-inspired video streaming platform homepage created using pure HTML and CSS. Designed to be fully responsive with a clean layout, hover effects, and embedded media elements to replicate the original user experience.
