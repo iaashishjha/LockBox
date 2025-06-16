@@ -1,0 +1,2 @@
+#LockBox
+A secure password management system built with React, Tailwind CSS, MongoDB, and Express. Features include encrypted password storage, authentication, and a modern UI for seamless usability. The backend ensures fast API processing and data security.
