@@ -1,131 +1,168 @@
-import React from "react";
-import { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
-
 import "react-toastify/dist/ReactToastify.css";
+
 
 const Manager = () => {
   const ref = useRef();
+  const [passwords, setPasswords] = useState([]);
   const passwordRef = useRef();
   const [form, setform] = useState({ site: "", username: "", password: "" });
   const [passwordArray, setPasswordArray] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+
+  
+
+  //displays passwords from database
+  const fetchPasswords = async () => {
+    try {
+      const res = await fetch('http://localhost:3000/');
+      const data = await res.json();
+      setPasswordArray(data);
+    } catch (err) {
+      console.error("Failed to fetch passwords:", err);
+    }
+  };
 
   useEffect(() => {
-    let passwords = localStorage.getItem("passwords");
-    if (passwords) {
-      setPasswordArray(JSON.parse(passwords));
-    }
+    fetchPasswords(); // Initial load
   }, []);
 
   const copyText = (text) => {
     toast("Copied to clipboard!", {
       position: "top-right",
-      autoClose: 5000,
+      autoClose: 3000,
       hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
+      closeOnClick: false,
+      pauseOnHover: false,
       draggable: true,
       progress: undefined,
       theme: "dark",
+      transition: Bounce,
     });
     navigator.clipboard.writeText(text);
   };
 
   const showPassword = () => {
-    passwordRef.current.type = "text";
-    console.log(ref.current.src);
-    if (ref.current.src.includes("icons/eyecross.png")) {
-      ref.current.src = "icons/eye.png";
-      passwordRef.current.type = "password";
-    } else {
-      passwordRef.current.type = "text";
+
+    if (passwordRef.current.type === "password") {
       ref.current.src = "icons/eyecross.png";
-    }
-  };
-
-  const savePassword = () => {
-    if (
-      form.site.length > 3 &&
-      form.username.length > 3 &&
-      form.password.length > 3
-    ) {
-      setPasswordArray([...passwordArray, { ...form, id: uuidv4() }]);
-      localStorage.setItem(
-        "passwords",
-        JSON.stringify([...passwordArray, { ...form, id: uuidv4() }])
-      );
-      console.log([...passwordArray, form]);
-      setform({ site: "", username: "", password: "" });
-      toast("Password saved!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
+      passwordRef.current.type = "text";
     } else {
-      toast("Error: Password not saved!");
+      passwordRef.current.type = "password";
+      ref.current.src = "icons/eye.png";
     }
   };
 
-  const deletePassword = (id) => {
-    console.log("Deleting password with id ", id);
-    let c = confirm("Do you really want to delete this password?");
-    if (c) {
-      setPasswordArray(passwordArray.filter((item) => item.id !== id));
-      localStorage.setItem(
-        "passwords",
-        JSON.stringify(passwordArray.filter((item) => item.id !== id))
-      );
-      toast("Password Deleted!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
+  const savePassword = async () => {
+  try {
+    if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
+      const newId = editingId || uuidv4();
+      const method = editingId ? "PUT" : "POST";
+
+      const res = await fetch("http://localhost:3000/", {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, id: newId }),
       });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error("Server error:", data);
+        toast("Server error while saving", { theme: "dark" });
+        return;
+      }
+
+      setform({ site: "", username: "", password: "" });
+      setEditingId(null);
+      await fetchPasswords(); // ✅ Refresh
+      toast("Password Saved", { theme: "dark" });
+    } else {
+      toast("Error: Invalid input", { theme: "dark" });
     }
+  } catch (error) {
+    console.error("Caught error:", error);
+    toast("Something went wrong while saving", { theme: "dark" });
+  }
+};
+
+  const deletePassword = async (id) => {
+    let c = confirm("do you really want to delete this password?")
+    if (c) {
+      await fetch("http://localhost:3000/", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) })
+      setPasswordArray(passwordArray.filter(item => item.id !== id))
+
+    }
+    toast('Password Deleted', {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      transition: Bounce,
+
+    });
+    await fetch('http://localhost:3000/', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    fetchPasswords(); // Refresh
   };
-  const editPassword = (id) => {
-    console.log("Editing password with id ", id);
-    setform(passwordArray.filter((i) => i.id === id)[0]);
-    setPasswordArray(passwordArray.filter((item) => item.id !== id));
+
+  const editPassword = async (id) => {
+    const selected = passwordArray.find(i => i.id === id);
+    if (selected) {
+      setform({ site: selected.site, username: selected.username, password: selected.password });
+      setEditingId(id); // Track which item is being edited
+    }
+    await fetch('http://localhost:3000/', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedPassword),
+    });
+    fetchPasswords(); // Refresh
+
   };
 
   const handleChange = (e) => {
-    setform({ ...form, [e.target.name]: e.target.value });
+    setform({ ...form, [e.target.name]: e.target.value })
   };
 
+  const cancelEdit = () => {
+    setform({ site: "", username: "", password: "" });
+    setEditingId(null);
+  };
+
+
   return (
-    <>
+    <> <div>
       <ToastContainer
         position="top-right"
-        autoClose={5000}
+        autoClose={3000}
         hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
+        newestOnTop
+        closeOnClick={false}
         rtl={false}
         pauseOnFocusLoss
         draggable
-        pauseOnHover
-        theme="light"
+        pauseOnHover={false}
+        theme="dark"
         transition="Bounce"
       />
-      {/* Same as */}
-      <ToastContainer />
+
+      
       <div className="absolute inset-0 -z-10 h-full w-full bg-green-50 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
         <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-green-400 opacity-20 blur-[100px]"></div>
       </div>
       <div className=" p-3 md:mycontainer min-h-[88.2vh] ">
         <h1 className="text-4xl text font-bold text-center">
-          {/* <span className="text-red-500"></span> */}
+
 
           <span>Lock</span>
           <span className="text-red-500">box</span>
@@ -184,11 +221,17 @@ const Manager = () => {
             className="flex justify-center items-center gap-2 bg-red-400 hover:bg-green-300 rounded-full px-8 py-2 w-fit border border-green-900"
           >
             <lord-icon
+              className="pointer-events-none"
               src="https://cdn.lordicon.com/jgnvfzqg.json"
               trigger="hover"
             ></lord-icon>
             Save
           </button>
+          {editingId && (
+            <button onClick={cancelEdit} className="bg-red-500 text-white px-4 py-2 rounded">
+              Cancel Edit
+            </button>
+          )}
         </div>
 
         <div className="passwords">
@@ -256,7 +299,7 @@ const Manager = () => {
                       </td>
                       <td className="py-2 border border-white text-center">
                         <div className="flex items-center justify-center ">
-                          <span>{"*".repeat(item.password.length)}</span>
+                          <span>{item.password ? "*".repeat(item.password.length) : "—"}</span>
                           <div
                             className="lordiconcopy size-7 cursor-pointer"
                             onClick={() => {
@@ -310,8 +353,10 @@ const Manager = () => {
           )}
         </div>
       </div>
+    </div>
     </>
   );
 };
+
 
 export default Manager;
