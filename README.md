@@ -1,8 +1,12 @@
-# WordSphere
-This dictionary app is built using React.js for the frontend and styled with Tailwind CSS for a clean, responsive UI. When a user enters a word into the search input, the app sends a GET request to the Free Dictionary API (https://api.dictionaryapi.dev/api/v2/entries/en/<word>). The response contains an array of word objects, each including definitions, parts of speech, phonetics, and more. The app parses this data and displays it in a structured format using reusable React components. If the word is not found or the API returns an error, the app gracefully handles it by showing a user-friendly message. The layout is optimized for both desktop and mobile devices, and the codebase is modular, making it easy to extend with features like pronunciation audio, synonyms, or dark mode in future updates.
+# LockBox
+-> secure password storage and clean architecture 
+-> Designed a scalable schema with per-user data isolation using userID clustering (authentication layer planned) 
+-> Built responsive UI with Tailwind CSS, featuring dynamic forms, toast notifications, and clipboard copy functionality 
+-> Enabled auto-refresh of password list after every CRUD operation for seamless UX 
 
-Preview: https://codesandbox.io/p/sandbox/github/iaashishjha/WordSphere
 
-Demo Video: https://youtu.be/tSJwKsG5gcE
+Preview: https://codesandbox.io/p/sandbox/github/iaashishjha/lockbox?file=%2Fsrc%2FApp.jsx
+
+
 
 
