@@ -13,7 +13,7 @@ const Manager = () => {
   //displays passwords from database
   const fetchPasswords = async () => {
     try {
-      const res = await fetch('http://localhost:5000/');
+      const res = await fetch('https://lock-box-eosin.vercel.app/');
       const data = await res.json();
       setPasswordArray(data);
     } catch (err) {
@@ -56,7 +56,7 @@ const Manager = () => {
         const newId = editingId || uuidv4();
         const method = editingId ? "PUT" : "POST";
 
-        const res = await fetch("http://localhost:5000/", {
+        const res = await fetch("https://lock-box-eosin.vercel.app/", {
           method,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...form, id: newId }),
@@ -86,7 +86,7 @@ const Manager = () => {
   const deletePassword = async (id) => {
     let c = window.confirm("do you really want to delete this password?");
     if (c) {
-      await fetch("http://localhost:5000/", {
+      await fetch("https://lock-box-eosin.vercel.app/", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
