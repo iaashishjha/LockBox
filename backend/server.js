@@ -25,7 +25,7 @@ client.connect().then(() => {
 // App & Database
 const dbName = process.env.DB_NAME;
 const app = express()
-const port = 3000
+const port = process.env.PORT || 5000; // Use uppercase and provide a default
 
 // Middleware
 app.use(express.json());
@@ -105,10 +105,4 @@ app.put('/', async (req, res) => {
 
 app.listen(port, () => {
   console.log(`Example app listening on  http://localhost:${port}`)
-})
-
-
-app.listen(port, () => {
-    console.log(`Example app listening on  http://localhost:${port}`)
-
 })
