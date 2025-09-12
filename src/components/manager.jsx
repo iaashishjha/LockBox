@@ -1,19 +1,23 @@
 import React, { useRef, useState, useEffect } from "react";
-import { ToastContainer, toast, Bounce } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
 import "react-toastify/dist/ReactToastify.css";
 
+
 const Manager = () => {
   const ref = useRef();
+  const [passwords, setPasswords] = useState([]);
   const passwordRef = useRef();
   const [form, setform] = useState({ site: "", username: "", password: "" });
   const [passwordArray, setPasswordArray] = useState([]);
   const [editingId, setEditingId] = useState(null);
 
+  
+
   //displays passwords from database
   const fetchPasswords = async () => {
     try {
-      const res = await fetch('https://lock-box-eosin.vercel.app/');
+      const res = await fetch('http://localhost:3000/');
       const data = await res.json();
       setPasswordArray(data);
     } catch (err) {
@@ -41,6 +45,7 @@ const Manager = () => {
   };
 
   const showPassword = () => {
+
     if (passwordRef.current.type === "password") {
       ref.current.src = "icons/eyecross.png";
       passwordRef.current.type = "text";
@@ -51,77 +56,89 @@ const Manager = () => {
   };
 
   const savePassword = async () => {
-    try {
-      if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
-        const newId = editingId || uuidv4();
-        const method = editingId ? "PUT" : "POST";
+  try {
+    if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
+      const newId = editingId || uuidv4();
+      const method = editingId ? "PUT" : "POST";
 
-        const res = await fetch("https://lock-box-eosin.vercel.app/", {
-          method,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...form, id: newId }),
-        });
+      const res = await fetch("http://localhost:3000/", {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, id: newId }),
+      });
 
-        const data = await res.json();
+      const data = await res.json();
 
-        if (!res.ok) {
-          console.error("Server error:", data);
-          toast("Server error while saving", { theme: "dark" });
-          return;
-        }
-
-        setform({ site: "", username: "", password: "" });
-        setEditingId(null);
-        await fetchPasswords(); // ✅ Refresh
-        toast("Password Saved", { theme: "dark" });
-      } else {
-        toast("Error: Invalid input", { theme: "dark" });
+      if (!res.ok) {
+        console.error("Server error:", data);
+        toast("Server error while saving", { theme: "dark" });
+        return;
       }
-    } catch (error) {
-      console.error("Caught error:", error);
-      toast("Something went wrong while saving", { theme: "dark" });
+
+      setform({ site: "", username: "", password: "" });
+      setEditingId(null);
+      await fetchPasswords(); // ✅ Refresh
+      toast("Password Saved", { theme: "dark" });
+    } else {
+      toast("Error: Invalid input", { theme: "dark" });
     }
-  };
+  } catch (error) {
+    console.error("Caught error:", error);
+    toast("Something went wrong while saving", { theme: "dark" });
+  }
+};
 
   const deletePassword = async (id) => {
-    let c = window.confirm("do you really want to delete this password?");
+    let c = confirm("do you really want to delete this password?")
     if (c) {
-      await fetch("https://lock-box-eosin.vercel.app/", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
-      toast('Password Deleted', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        transition: Bounce,
-      });
-      fetchPasswords(); // Refresh
+      await fetch("http://localhost:3000/", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) })
+      setPasswordArray(passwordArray.filter(item => item.id !== id))
+
     }
+    toast('Password Deleted', {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      transition: Bounce,
+
+    });
+    await fetch('http://localhost:3000/', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    fetchPasswords(); // Refresh
   };
 
-  const editPassword = (id) => {
+  const editPassword = async (id) => {
     const selected = passwordArray.find(i => i.id === id);
     if (selected) {
       setform({ site: selected.site, username: selected.username, password: selected.password });
       setEditingId(id); // Track which item is being edited
     }
+    await fetch('http://localhost:3000/', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedPassword),
+    });
+    fetchPasswords(); // Refresh
+
   };
 
   const handleChange = (e) => {
-    setform({ ...form, [e.target.name]: e.target.value });
+    setform({ ...form, [e.target.name]: e.target.value })
   };
 
   const cancelEdit = () => {
     setform({ site: "", username: "", password: "" });
     setEditingId(null);
   };
+
 
   return (
     <> <div>
@@ -136,7 +153,7 @@ const Manager = () => {
         draggable
         pauseOnHover={false}
         theme="dark"
-        transition={Bounce}
+        transition="Bounce"
       />
 
       
