@@ -36,6 +36,13 @@ app.use(express.json());
 app.use(bodyparser.json());
 app.use(cors());
 
+app.get('/',(req,res)=>{
+  res.send({
+    activeStatus:true,
+    error:false
+  })
+})
+
 
 // Get all the passwords
 app.get('/', async (req, res) => {
