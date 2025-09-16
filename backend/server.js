@@ -9,9 +9,6 @@ dotenv.config()
 
 
 // Connecting to the MongoDB Client
-let isConnected =false;
-
-
 const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -22,7 +19,6 @@ const client = new MongoClient(uri, {
 
 
 client.connect().then(() => {
-  isConnected=true;
   console.log("MongoDB connected");
 }).catch(err => {
   console.error("MongoDB connection failed:", err);
@@ -122,4 +118,4 @@ app.put('/', async (req, res) => {
 //   console.log(`Example app listening on  http://localhost:${port}`)
 // })
 
-module.exports=app
+module.exports =app;
