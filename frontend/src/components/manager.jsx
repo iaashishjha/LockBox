@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer, toast, Bounce } from "react-toastify"; // Add Bounce import
 import { v4 as uuidv4 } from "uuid";
 import "react-toastify/dist/ReactToastify.css";
+
 
 
 const Manager = () => {
@@ -17,10 +18,16 @@ const Manager = () => {
   //displays passwords from database
   const fetchPasswords = async () => {
     try {
-      const res = await fetch('http://localhost:3000/');
+      const res = await fetch('http://localhost:5000/');
       const data = await res.json();
-      setPasswordArray(data);
+      if (Array.isArray(data)) {
+        setPasswordArray(data);
+      } else {
+        setPasswordArray([]); // fallback to empty array
+        console.error("API did not return an array:", data);
+      }
     } catch (err) {
+      setPasswordArray([]); // fallback to empty array
       console.error("Failed to fetch passwords:", err);
     }
   };
@@ -61,7 +68,7 @@ const Manager = () => {
       const newId = editingId || uuidv4();
       const method = editingId ? "PUT" : "POST";
 
-      const res = await fetch("http://localhost:3000/", {
+      const res = await fetch("http://localhost:5000/", {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, id: newId }),
@@ -77,7 +84,7 @@ const Manager = () => {
 
       setform({ site: "", username: "", password: "" });
       setEditingId(null);
-      await fetchPasswords(); // ✅ Refresh
+      await fetchPasswords();
       toast("Password Saved", { theme: "dark" });
     } else {
       toast("Error: Invalid input", { theme: "dark" });
@@ -89,45 +96,35 @@ const Manager = () => {
 };
 
   const deletePassword = async (id) => {
-    let c = confirm("do you really want to delete this password?")
+    let c = confirm("do you really want to delete this password?");
     if (c) {
-      await fetch("http://localhost:3000/", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) })
-      setPasswordArray(passwordArray.filter(item => item.id !== id))
-
+      await fetch("http://localhost:5000/", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      setPasswordArray(passwordArray.filter(item => item.id !== id));
+      toast('Password Deleted', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      });
+      fetchPasswords();
     }
-    toast('Password Deleted', {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: false,
-      pauseOnHover: false,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-      transition: Bounce,
-
-    });
-    await fetch('http://localhost:3000/', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    });
-    fetchPasswords(); // Refresh
   };
 
-  const editPassword = async (id) => {
+  const editPassword = (id) => {
     const selected = passwordArray.find(i => i.id === id);
     if (selected) {
       setform({ site: selected.site, username: selected.username, password: selected.password });
-      setEditingId(id); // Track which item is being edited
+      setEditingId(id);
     }
-    await fetch('http://localhost:3000/', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedPassword),
-    });
-    fetchPasswords(); // Refresh
-
   };
 
   const handleChange = (e) => {
@@ -153,7 +150,7 @@ const Manager = () => {
         draggable
         pauseOnHover={false}
         theme="dark"
-        transition="Bounce"
+        transition={Bounce}
       />
 
       
