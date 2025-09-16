@@ -7,10 +7,15 @@ let cachedClient = null;
 
 async function connectToDatabase() {
   if (cachedClient) return cachedClient;
-  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-  await client.connect();
-  cachedClient = client;
-  return client;
+  try {
+    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client.connect();
+    cachedClient = client;
+    return client;
+  } catch (err) {
+    console.error("MongoDB connection error:", err);
+    throw err;
+  }
 }
 
 module.exports = async (req, res) => {
@@ -23,6 +28,22 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
+  }
+
+  // --- Parse JSON body if needed ---
+  if (req.method !== 'GET') {
+    try {
+      if (!req.body) {
+        let body = '';
+        await new Promise((resolve) => {
+          req.on('data', (chunk) => { body += chunk; });
+          req.on('end', resolve);
+        });
+        req.body = body ? JSON.parse(body) : {};
+      }
+    } catch (err) {
+      return res.status(400).json({ error: 'Invalid JSON' });
+    }
   }
 
   try {
