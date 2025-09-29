@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/passwords.js",
+      "src": "server.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/passwords",
-      "dest": "/api/passwords.js"
+      "src": "/",
+      "dest": "/server.js"
     }
   ]
 }
