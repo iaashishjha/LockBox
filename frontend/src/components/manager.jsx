@@ -13,12 +13,22 @@ const Manager = () => {
   const [passwordArray, setPasswordArray] = useState([]);
   const [editingId, setEditingId] = useState(null);
 
-  
+  const token = localStorage.getItem("token");
+
+
+
 
   //displays passwords from database
   const fetchPasswords = async () => {
     try {
-      const res = await fetch('https://lock-box-eight.vercel.app/api/passwords');
+      const res = await fetch('http://localhost:5000', {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       const data = await res.json();
       if (Array.isArray(data)) {
         setPasswordArray(data);
@@ -63,44 +73,44 @@ const Manager = () => {
   };
 
   const savePassword = async () => {
-  try {
-    if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
-      const newId = editingId || uuidv4();
-      const method = editingId ? "PUT" : "POST";
+    try {
+      if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
+        const newId = editingId || uuidv4();
+        const method = editingId ? "PUT" : "POST";
 
-      const res = await fetch("https://lock-box-eight.vercel.app/api/passwords", {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, id: newId }),
-      });
+        const res = await fetch("http://localhost:5000", {
+          method,
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ ...form, id: newId }),
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (!res.ok) {
-        console.error("Server error:", data);
-        toast("Server error while saving", { theme: "dark" });
-        return;
+        if (!res.ok) {
+          console.error("Server error:", data);
+          toast("Server error while saving", { theme: "dark" });
+          return;
+        }
+
+        setform({ site: "", username: "", password: "" });
+        setEditingId(null);
+        await fetchPasswords();
+        toast("Password Saved", { theme: "dark" });
+      } else {
+        toast("Error: Invalid input", { theme: "dark" });
       }
-
-      setform({ site: "", username: "", password: "" });
-      setEditingId(null);
-      await fetchPasswords();
-      toast("Password Saved", { theme: "dark" });
-    } else {
-      toast("Error: Invalid input", { theme: "dark" });
+    } catch (error) {
+      console.error("Caught error:", error);
+      toast("Something went wrong while saving", { theme: "dark" });
     }
-  } catch (error) {
-    console.error("Caught error:", error);
-    toast("Something went wrong while saving", { theme: "dark" });
-  }
-};
+  };
 
   const deletePassword = async (id) => {
     let c = confirm("do you really want to delete this password?");
     if (c) {
-      await fetch("https://lock-box-eight.vercel.app/api/passwords", {
+      await fetch("http://localhost:5000", {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ id }),
       });
       setPasswordArray(passwordArray.filter(item => item.id !== id));
@@ -153,7 +163,7 @@ const Manager = () => {
         transition={Bounce}
       />
 
-      
+
       <div className="absolute inset-0 -z-10 h-full w-full bg-green-50 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
         <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-green-400 opacity-20 blur-[100px]"></div>
       </div>

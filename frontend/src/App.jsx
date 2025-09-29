@@ -1,22 +1,26 @@
 import { useState } from 'react' 
 import './App.css'
-import Navbar from './components/navbar'
-import Manager from './components/manager'
-import Footer from './components/footer'
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Home from './pages/Home';
+import Profile from './pages/Profile';
+import Welcome from './pages/Welcome'
 
 function App() { 
 
   return (
     <>
-        <Navbar /> 
-
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Welcome/>} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/profile" element={<Profile />} />
+        </Routes>
+      </BrowserRouter>
         
-
-        <div className="bg-green-50 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
-
-       <Manager/> 
-        </div>
-       <Footer/>
     </>
   )
 }

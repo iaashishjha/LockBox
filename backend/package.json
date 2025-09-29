@@ -1,17 +1,25 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "api/passwords.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node api/passwords.js" 
+    "start": "node --watch server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "dotenv": "^16.4.5",
-    "mongodb": "^6.19.0"
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "joi": "^18.0.1",
+    "jot": "^0.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.19.0",
+    "mongoose": "^8.18.2"
   }
 }
