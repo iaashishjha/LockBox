@@ -17,9 +17,7 @@ app.use(bodyParser.json());
 
 app.use('/auth', AuthRouter);
 
-app.get('/', (req, res) => {
-  res.send('LockBox API is running');
-});
+
 
 // ✅ Get all passwords for logged-in user
 app.get('/', authMiddleware, async (req, res) => {
