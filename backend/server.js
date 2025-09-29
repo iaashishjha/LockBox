@@ -17,10 +17,12 @@ app.use(bodyParser.json());
 
 app.use('/auth', AuthRouter);
 
-
+app.get('/', (req, res) => {
+  res.send('LockBox API is running');
+});
 
 // ✅ Get all passwords for logged-in user
-app.get('/', authMiddleware, async (req, res) => {
+app.get('/passwords', authMiddleware, async (req, res) => {
   try {
     const passwords = await Password.find({ userId: req.userId });
     res.json(passwords);
@@ -31,7 +33,7 @@ app.get('/', authMiddleware, async (req, res) => {
 });
 
 // ✅ Save or update password
-app.post('/', authMiddleware, async (req, res) => {
+app.post('/passwords', authMiddleware, async (req, res) => {
   try {
     const { id, site, username, password } = req.body;
     const existing = await Password.findOne({ id, userId: req.userId });
@@ -54,7 +56,7 @@ app.post('/', authMiddleware, async (req, res) => {
 });
 
 // ✅ Delete password
-app.delete('/', authMiddleware, async (req, res) => {
+app.delete('/passwords', authMiddleware, async (req, res) => {
   try {
     const result = await Password.findOneAndDelete({ id: req.body.id, userId: req.userId });
     res.send({ success: true, result });
@@ -65,7 +67,7 @@ app.delete('/', authMiddleware, async (req, res) => {
 });
 
 // ✅ Update password (alternative PUT route)
-app.put('/', authMiddleware, async (req, res) => {
+app.put('/passwords', authMiddleware, async (req, res) => {
   try {
     const { id, site, username, password } = req.body;
     if (!id) return res.status(400).json({ error: "Missing ID for update" });
