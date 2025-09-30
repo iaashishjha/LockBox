@@ -3,12 +3,12 @@ const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
-const AuthRouter = require('./routes/AuthRouter');
-const Password = require('./models/password');
-const authMiddleware = require('./middleware/authMiddleware');
+const AuthRouter = require('../routes/AuthRouter');
+const Password = require('../models/password');
+const authMiddleware = require('../middleware/authMiddleware');
 
 dotenv.config();
-require('./models/db');
+require('../models/db');
 
 const PORT = process.env.PORT || 5000;
 
@@ -85,4 +85,11 @@ app.put('/passwords', authMiddleware, async (req, res) => {
   }
 });
 
-module.exports = app;
+module.exports = (req, res) => {
+  app(req, res);
+};
+
+
+// app.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}`);
+// });
