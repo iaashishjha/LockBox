@@ -21,7 +21,7 @@ const Manager = () => {
   //displays passwords from database
   const fetchPasswords = async () => {
     try {
-      const res = await fetch('http://localhost:5000/passwords', {
+      const res = await fetch('https://lock-box-server.vercel.app/passwords', {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -78,7 +78,7 @@ const Manager = () => {
         const newId = editingId || uuidv4();
         const method = editingId ? "PUT" : "POST";
 
-        const res = await fetch("http://localhost:5000/passwords", {
+        const res = await fetch("https://lock-box-server.vercel.app/passwords", {
           method,
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({ ...form, id: newId }),
@@ -108,7 +108,7 @@ const Manager = () => {
   const deletePassword = async (id) => {
     let c = confirm("do you really want to delete this password?");
     if (c) {
-      await fetch("http://localhost:5000/passwords", {
+      await fetch("https://lock-box-server.vercel.app/passwords", {
         method: "DELETE",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ id }),
