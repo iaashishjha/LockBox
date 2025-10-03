@@ -11,33 +11,34 @@ const authMiddleware = require('../middleware/authMiddleware');
 dotenv.config();
 require('../models/db');
 
-app.get('/ping', (req, res) => {
-  res.send('pong');
-});
+// app.get('/ping', (req, res) => {
+//   res.send('pong');
+// });
 
-process.on('uncaughtException', err => {
-  console.error('Uncaught Exception:', err);
-});
+// process.on('uncaughtException', err => {
+//   console.error('Uncaught Exception:', err);
+// });
 
-process.on('unhandledRejection', err => {
-  console.error('Unhandled Rejection:', err);
-});
+// process.on('unhandledRejection', err => {
+//   console.error('Unhandled Rejection:', err);
+// });
 
 const PORT = process.env.PORT || 5000;
 
-app.use(cors({
-  origin: 'https://lock-box-pied.vercel.app',
-  credentials: true
-}));
+app.use(cors());
+// app.use(cors({
+//   origin: 'https://lock-box-pied.vercel.app',
+//   credentials: true
+// }));
 
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, './client')));
+// app.use(express.static(path.join(__dirname, './client')));
 
 app.use('/auth', AuthRouter);
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, './client/index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, './client/index.html'));
+// });
 
 
 app.get('/', (req, res) => {
