@@ -11,6 +11,10 @@ const authMiddleware = require('../middleware/authMiddleware');
 dotenv.config();
 require('../models/db');
 
+app.get('/ping', (req, res) => {
+  res.send('pong');
+});
+
 process.on('uncaughtException', err => {
   console.error('Uncaught Exception:', err);
 });
