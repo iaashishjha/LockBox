@@ -11,6 +11,14 @@ const authMiddleware = require('../middleware/authMiddleware');
 dotenv.config();
 require('../models/db');
 
+process.on('uncaughtException', err => {
+  console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', err => {
+  console.error('Unhandled Rejection:', err);
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
