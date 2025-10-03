@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
@@ -12,20 +13,20 @@ require('../models/db');
 
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
 app.use(cors({
   origin: 'https://lock-box-pied.vercel.app',
   credentials: true
 }));
 
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, '../client/dist')));
+app.use(express.static(path.join(__dirname, './client')));
 
 app.use('/auth', AuthRouter);
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  res.sendFile(path.join(__dirname, './client/index.html'));
 });
+
 
 app.get('/', (req, res) => {
   res.send('LockBox API is running');
@@ -96,7 +97,7 @@ app.put('/passwords', authMiddleware, async (req, res) => {
 });
 
 module.exports = (req, res) => {
-  app(req, res);
+  app.handle(req, res);
 };
 
 
