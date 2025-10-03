@@ -13,6 +13,11 @@ require('../models/db');
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
+app.use(cors({
+  origin: 'https://lock-box-pied.vercel.app',
+  credentials: true
+}));
+
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
