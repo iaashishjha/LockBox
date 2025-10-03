@@ -14,8 +14,13 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, '../client/dist')));
 
 app.use('/auth', AuthRouter);
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
 
 app.get('/', (req, res) => {
   res.send('LockBox API is running');
